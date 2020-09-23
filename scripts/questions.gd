@@ -2,7 +2,6 @@ extends Node
 
 var root
 
-<<<<<<< HEAD
 var ans1
 var ans2
 var ans3
@@ -15,6 +14,7 @@ func _ready():
 	root = get_tree().get_root().get_node("main")
 	root.connect("NEW_ROUND", self, "on_new_round")
 	root.connect("NEW_QUESTION", self, "on_new_question")
+	root.connect("ADVANCE_ANSWER", self, "on_answer_advance")
 	
 	ans1 = get_node("answer1/text")
 	ans2 = get_node("answer2/text")
@@ -22,6 +22,8 @@ func _ready():
 	ans4 = get_node("answer4/text")
 
 func updateLabels():
+	if(cRound.questions.size() <= currQuestion):
+		return
 	ans1.text = cRound.questions[currQuestion].answer1
 	ans2.text = cRound.questions[currQuestion].answer2
 	ans3.text = cRound.questions[currQuestion].answer3
@@ -33,13 +35,10 @@ func on_new_round(roundVar):
 	cRound = roundVar
 	print("NEW ROUND TRIGGERED!")
 	updateLabels()
-	breakpoint
-
 
 func on_new_question():
+	if(cRound.questions.size() <= currQuestion):
+		print("asked for a question that doesn't exist!")
+		return;
 	currQuestion+=1
-	ans1.text = "hallo"
-=======
-func _ready():
-	root = get_tree().get_root().get_node("main")
->>>>>>> 65cef6e038f2bedb7eab2f8a6d036ba3f100d403
+	updateLabels()

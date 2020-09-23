@@ -1,11 +1,9 @@
 extends Node
 
-<<<<<<< HEAD
 signal NEW_QUESTION()
+signal ADVANCE_ANSWER()
 signal NEW_ROUND(roundVar)
 
-=======
->>>>>>> 65cef6e038f2bedb7eab2f8a6d036ba3f100d403
 class QUESTION:
 	var answer1: String
 	var answer2: String
@@ -19,7 +17,6 @@ class ROUND:
 
 export var content = []
 var csvFile = File.new()
-<<<<<<< HEAD
 export var currentRound = 0
 export var currentQuestion = 0
 
@@ -27,12 +24,6 @@ func loadFile():
 	print(OS.get_user_data_dir())
 	print(OS.get_executable_path())
 	print(csvFile.open("res://questions/loli.csv", File.READ))
-=======
-
-func loadFile():
-	print(OS.get_user_data_dir())
-	print(csvFile.open("user://loli.csv", File.READ))
->>>>>>> 65cef6e038f2bedb7eab2f8a6d036ba3f100d403
 	
 	var inRound = false
 	var tRound = ROUND.new()
@@ -63,10 +54,8 @@ func loadFile():
 	if(inRound): #if we reached the end of the file without finishing the last round
 		content.append(tRound)
 
-<<<<<<< HEAD
 func _ready():
 	loadFile()
-	#emit_signal("NEW_ROUND", content[currentQuestion])
 
 func _process(delta):
 	if Input.is_action_just_pressed("advance_round"):
@@ -75,10 +64,3 @@ func _process(delta):
 	
 	if Input.is_action_just_pressed("team1_button1"):
 		emit_signal("NEW_QUESTION")
-=======
-
-func _ready():
-	#example()
-	loadFile()
-
->>>>>>> 65cef6e038f2bedb7eab2f8a6d036ba3f100d403
