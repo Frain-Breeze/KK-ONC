@@ -2,6 +2,7 @@ extends Node
 
 var root
 
+<<<<<<< HEAD
 var ans1
 var ans2
 var ans3
@@ -38,3 +39,7 @@ func on_new_round(roundVar):
 func on_new_question():
 	currQuestion+=1
 	ans1.text = "hallo"
+=======
+func _ready():
+	root = get_tree().get_root().get_node("main")
+>>>>>>> 65cef6e038f2bedb7eab2f8a6d036ba3f100d403
