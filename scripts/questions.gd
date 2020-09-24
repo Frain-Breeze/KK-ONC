@@ -33,6 +33,10 @@ func updateLabels():
 		ans2.text = cRound.questions[currQuestion].answer2
 		ans3.text = cRound.questions[currQuestion].answer3
 		ans4.text = cRound.questions[currQuestion].answer4
+		print("ans1: " + ans1.text)
+		print("ans2: " + ans2.text)
+		print("ans3: " + ans3.text)
+		print("ans4: " + ans4.text)
 	else: #we have to display the current question
 		quest.text = cRound.questions[currQuestion].question
 		ans1.text = ""

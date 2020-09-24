@@ -47,7 +47,7 @@ func loadFile():
 			tQuest.question = cstr[0]
 			var array = [1,2,3,4]
 			var yes = array[rng.randi()%array.size()]
-			tQuest.correctAnswer = yes
+			tQuest.correctAnswer = yes%4
 			print("1:" + str((yes+0)%array.size()))
 			print("2:" + str((yes+1)%array.size()))
 			print("3:" + str((yes+2)%array.size()))
@@ -70,6 +70,8 @@ func loadFile():
 func _ready():
 	rng.randomize()
 	loadFile()
+	emit_signal("NEW_ROUND", content[currentRound])
+	currentRound+=1
 
 #order of signals:
 #1 advance_round (load new round)
@@ -78,13 +80,13 @@ func _ready():
 #4 repeat 2 and 3 until all questions are done, then move to 1
 
 func _process(delta):
-	if Input.is_action_just_pressed("team1_button1") and content[currentRound].questions[currentQuestion].correctAnswer == 1:
+	if Input.is_action_just_pressed("team1_button1") and content[currentRound].questions[currentQuestion].correctAnswer == 0:
 		print("team1_button1")
-	if Input.is_action_just_pressed("team1_button2") and content[currentRound].questions[currentQuestion].correctAnswer == 2:
+	if Input.is_action_just_pressed("team1_button2") and content[currentRound].questions[currentQuestion].correctAnswer == 1:
 		print("team1_button2")
-	if Input.is_action_just_pressed("team1_button3") and content[currentRound].questions[currentQuestion].correctAnswer == 3:
+	if Input.is_action_just_pressed("team1_button3") and content[currentRound].questions[currentQuestion].correctAnswer == 2:
 		print("team1_button3")
-	if Input.is_action_just_pressed("team1_button4") and content[currentRound].questions[currentQuestion].correctAnswer == 4:
+	if Input.is_action_just_pressed("team1_button4") and content[currentRound].questions[currentQuestion].correctAnswer == 3:
 		print("team1_button4")
 	
 	if Input.is_action_just_pressed("team2_button1") and content[currentRound].questions[currentQuestion].correctAnswer == 0:
@@ -102,6 +104,7 @@ func _process(delta):
 	
 	if Input.is_action_just_pressed("advance_question"):
 		emit_signal("ADVANCE_ANSWER")
+		currentQuestion+=1
 		print(content[currentRound].questions[currentQuestion].correctAnswer)
 	
 	
