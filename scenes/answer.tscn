@@ -1,0 +1,21 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://assets/Greyscale Basic/GB_bold.tres" type="DynamicFont" id=1]
+
+[node name="answer" type="Control"]
+margin_right = 40.0
+margin_bottom = 40.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="text" type="Label" parent="."]
+margin_right = 203.0
+margin_bottom = 40.0
+custom_fonts/font = ExtResource( 1 )
+text = "yes"
+align = 1
+valign = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
