@@ -10,6 +10,7 @@ class QUESTION:
 	var answer3: String
 	var answer4: String
 	var question: String
+	var correctAnswer
 
 class ROUND:
 	var questions = []
@@ -19,6 +20,7 @@ export var content = []
 var csvFile = File.new()
 export var currentRound = 0
 export var currentQuestion = 0
+var rng = RandomNumberGenerator.new()
 
 func loadFile():
 	print(OS.get_user_data_dir())
@@ -43,10 +45,21 @@ func loadFile():
 			tRound.roundName = cstr[0]
 		elif(inRound): #this line has questions
 			tQuest.question = cstr[0]
-			tQuest.answer1 = cstr[1]
-			tQuest.answer2 = cstr[2]
-			tQuest.answer3 = cstr[3]
-			tQuest.answer4 = cstr[4]
+			var array = [1,2,3,4]
+			var yes = array[rng.randi()%array.size()]
+			tQuest.correctAnswer = yes
+			print("1:" + str((yes+0)%array.size()))
+			print("2:" + str((yes+1)%array.size()))
+			print("3:" + str((yes+2)%array.size()))
+			print("4:" + str((yes+3)%array.size()))
+			#tQuest.answer1 = cstr[1]
+			#tQuest.answer2 = cstr[2]
+			#tQuest.answer3 = cstr[3]
+			#tQuest.answer4 = cstr[4]
+			tQuest.answer1 = cstr[1+((yes+0)%array.size())]
+			tQuest.answer2 = cstr[1+((yes+1)%array.size())]
+			tQuest.answer3 = cstr[1+((yes+2)%array.size())]
+			tQuest.answer4 = cstr[1+((yes+3)%array.size())]
 			#tRound.questions.append(tQuest)
 			tRound.questions.append(tQuest)
 			tQuest = QUESTION.new()
@@ -55,12 +68,43 @@ func loadFile():
 		content.append(tRound)
 
 func _ready():
+	rng.randomize()
 	loadFile()
 
+#order of signals:
+#1 advance_round (load new round)
+#2 advance_answer (go to the answer)
+#3 advance_question (go to the next question)
+#4 repeat 2 and 3 until all questions are done, then move to 1
+
 func _process(delta):
+	if Input.is_action_just_pressed("team1_button1") and content[currentRound].questions[currentQuestion].correctAnswer == 1:
+		print("team1_button1")
+	if Input.is_action_just_pressed("team1_button2") and content[currentRound].questions[currentQuestion].correctAnswer == 2:
+		print("team1_button2")
+	if Input.is_action_just_pressed("team1_button3") and content[currentRound].questions[currentQuestion].correctAnswer == 3:
+		print("team1_button3")
+	if Input.is_action_just_pressed("team1_button4") and content[currentRound].questions[currentQuestion].correctAnswer == 4:
+		print("team1_button4")
+	
+	if Input.is_action_just_pressed("team2_button1") and content[currentRound].questions[currentQuestion].correctAnswer == 0:
+		print("team2_button1")
+	if Input.is_action_just_pressed("team2_button2") and content[currentRound].questions[currentQuestion].correctAnswer == 1:
+		print("team2_button2")
+	if Input.is_action_just_pressed("team2_button3") and content[currentRound].questions[currentQuestion].correctAnswer == 2:
+		print("team2_button3")
+	if Input.is_action_just_pressed("team2_button4") and content[currentRound].questions[currentQuestion].correctAnswer == 3:
+		print("team2_button4")
+	
 	if Input.is_action_just_pressed("advance_round"):
 		emit_signal("NEW_ROUND", content[currentRound])
 		currentRound+=1
 	
-	if Input.is_action_just_pressed("team1_button1"):
+	if Input.is_action_just_pressed("advance_question"):
+		emit_signal("ADVANCE_ANSWER")
+		print(content[currentRound].questions[currentQuestion].correctAnswer)
+	
+	
+	if Input.is_action_just_pressed("new_question"):
 		emit_signal("NEW_QUESTION")
+	
