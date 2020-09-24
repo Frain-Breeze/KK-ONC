@@ -39,10 +39,10 @@ func updateLabels():
 		print("ans4: " + ans4.text)
 	else: #we have to display the current question
 		quest.text = cRound.questions[currQuestion].question
-		ans1.text = ""
-		ans2.text = ""
-		ans3.text = ""
-		ans4.text = ""
+		#ans1.text = ""
+		#ans2.text = ""
+		#ans3.text = ""
+		#ans4.text = ""
 
 func on_new_round(roundVar):
 	#roundVar.questions.size()
