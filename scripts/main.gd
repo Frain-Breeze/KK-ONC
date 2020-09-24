@@ -45,9 +45,12 @@ func loadFile():
 			tRound.roundName = cstr[0]
 		elif(inRound): #this line has questions
 			tQuest.question = cstr[0]
-			var array = [1,2,3,4]
-			var yes = array[rng.randi()%array.size()]
-			tQuest.correctAnswer = yes%4
+			var array = [0,1,2,3]
+			#var yes = array[rng.randi()%array.size()]
+			var yes = rng.randi_range(0,3)
+			#var yes = 4
+			#tQuest.correctAnswer = cstr[1]
+			tQuest.correctAnswer = abs(3-(yes%4))
 			print("1:" + str((yes+0)%array.size()))
 			print("2:" + str((yes+1)%array.size()))
 			print("3:" + str((yes+2)%array.size()))
@@ -56,6 +59,7 @@ func loadFile():
 			#tQuest.answer2 = cstr[2]
 			#tQuest.answer3 = cstr[3]
 			#tQuest.answer4 = cstr[4]
+			print("arraysize: " + str(array.size()))
 			tQuest.answer1 = cstr[1+((yes+0)%array.size())]
 			tQuest.answer2 = cstr[1+((yes+1)%array.size())]
 			tQuest.answer3 = cstr[1+((yes+2)%array.size())]
@@ -80,23 +84,28 @@ func _ready():
 #4 repeat 2 and 3 until all questions are done, then move to 1
 
 func _process(delta):
-	if Input.is_action_just_pressed("team1_button1") and content[currentRound].questions[currentQuestion].correctAnswer == 0:
+	if Input.is_action_just_pressed("show_correct_answer"):
+		print("correct answer: " + str(content[currentRound].questions[currentQuestion].correctAnswer))
+	
+	if Input.is_action_just_pressed("team1_button1") and content[currentRound].questions[currentQuestion-1].correctAnswer == 0:
 		print("team1_button1")
-	if Input.is_action_just_pressed("team1_button2") and content[currentRound].questions[currentQuestion].correctAnswer == 1:
+	if Input.is_action_just_pressed("team1_button2") and content[currentRound].questions[currentQuestion-1].correctAnswer == 1:
 		print("team1_button2")
-	if Input.is_action_just_pressed("team1_button3") and content[currentRound].questions[currentQuestion].correctAnswer == 2:
+	if Input.is_action_just_pressed("team1_button3") and content[currentRound].questions[currentQuestion-1].correctAnswer == 2:
 		print("team1_button3")
-	if Input.is_action_just_pressed("team1_button4") and content[currentRound].questions[currentQuestion].correctAnswer == 3:
+	if Input.is_action_just_pressed("team1_button4") and content[currentRound].questions[currentQuestion-1].correctAnswer == 3:
 		print("team1_button4")
 	
-	if Input.is_action_just_pressed("team2_button1") and content[currentRound].questions[currentQuestion].correctAnswer == 0:
+	if Input.is_action_just_pressed("team2_button1") and content[currentRound].questions[currentQuestion-1].correctAnswer == 0:
 		print("team2_button1")
-	if Input.is_action_just_pressed("team2_button2") and content[currentRound].questions[currentQuestion].correctAnswer == 1:
+	if Input.is_action_just_pressed("team2_button2") and content[currentRound].questions[currentQuestion-1].correctAnswer == 1:
 		print("team2_button2")
-	if Input.is_action_just_pressed("team2_button3") and content[currentRound].questions[currentQuestion].correctAnswer == 2:
+	if Input.is_action_just_pressed("team2_button3") and content[currentRound].questions[currentQuestion-1].correctAnswer == 2:
 		print("team2_button3")
-	if Input.is_action_just_pressed("team2_button4") and content[currentRound].questions[currentQuestion].correctAnswer == 3:
+	if Input.is_action_just_pressed("team2_button4") and content[currentRound].questions[currentQuestion-1].correctAnswer == 3:
 		print("team2_button4")
+	
+	
 	
 	if Input.is_action_just_pressed("advance_round"):
 		emit_signal("NEW_ROUND", content[currentRound])
