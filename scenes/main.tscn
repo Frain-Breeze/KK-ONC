@@ -5,6 +5,6 @@
 
 [node name="main" type="Node"]
 script = ExtResource( 1 )
-autoAdvanceQuestion = true
 
 [node name="UI" parent="." instance=ExtResource( 2 )]
+

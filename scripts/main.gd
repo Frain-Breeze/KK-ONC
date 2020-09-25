@@ -24,7 +24,7 @@ var inAnswers = false
 func loadFile():
 	print(OS.get_user_data_dir())
 	print(OS.get_executable_path())
-	print(csvFile.open("res://questions/loli.csv", File.READ))
+	print(csvFile.open("res://questions/kk-vragen.csv", File.READ))
 	
 	var inRound = false
 	var tRound = ROUND.new()
