@@ -102,8 +102,10 @@ func update_labels():
 		$UI/questions/answer2/text.text = ""
 		$UI/questions/answer3/text.text = ""
 		$UI/questions/answer4/text.text = ""
-		if(currentRound >= content.size()-1):
+		if(currentRound >= content.size()): 
 			$UI/questions/question/text.text = "end of quiz"
+		elif(currentRound >= content.size()-1):
+			$UI/questions/question/text.text = "finale"
 		else:
 			$UI/questions/question/text.text = "moving on to round " + str(currentRound+2)
 		return
