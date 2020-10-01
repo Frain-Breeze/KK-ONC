@@ -10,17 +10,21 @@ __meta__ = {
 }
 
 [node name="text" type="Label" parent="."]
-margin_right = 203.0
-margin_bottom = 51.0
+margin_left = 122.601
+margin_top = -40.9547
+margin_right = 650.601
+margin_bottom = 10.0453
 custom_fonts/font = ExtResource( 1 )
 text = "yes"
 align = 1
 valign = 1
+autowrap = true
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [node name="Panel" type="Panel" parent="text"]
+visible = false
 margin_right = 40.0
 margin_bottom = 40.0
 

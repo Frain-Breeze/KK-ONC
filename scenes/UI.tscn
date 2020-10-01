@@ -22,6 +22,10 @@ margin_right = -1390.0
 margin_bottom = -270.0
 
 [node name="text" parent="questions/answer1" index="0"]
+margin_left = 0.0
+margin_top = -24.0
+margin_right = 536.0
+margin_bottom = 27.0
 text = "answ1"
 
 [node name="answer2" parent="questions" instance=ExtResource( 1 )]
@@ -33,28 +37,40 @@ margin_right = -808.0
 margin_bottom = -260.0
 
 [node name="text" parent="questions/answer2" index="0"]
+margin_left = 66.6008
+margin_top = -24.9547
+margin_right = 594.601
+margin_bottom = 26.0453
 text = "answ2"
 
 [node name="answer3" parent="questions" instance=ExtResource( 1 )]
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_left = 490.0
-margin_top = 892.0
+margin_top = 926.0
 margin_right = -1390.0
-margin_bottom = -148.0
+margin_bottom = -114.0
 
 [node name="text" parent="questions/answer3" index="0"]
+margin_left = 5.60083
+margin_top = 1.04527
+margin_right = 533.601
+margin_bottom = 52.0453
 text = "answ3"
 
 [node name="answer4" parent="questions" instance=ExtResource( 1 )]
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = 1068.0
-margin_top = 894.0
-margin_right = -812.0
-margin_bottom = -146.0
+margin_left = 1069.0
+margin_top = 929.0
+margin_right = -811.0
+margin_bottom = -111.0
 
 [node name="text" parent="questions/answer4" index="0"]
+margin_left = 69.6008
+margin_top = -1.95473
+margin_right = 597.601
+margin_bottom = 49.0453
 text = "answ4"
 
 [node name="question" parent="questions" instance=ExtResource( 1 )]
@@ -79,9 +95,11 @@ texture = ExtResource( 2 )
 centered = false
 
 [node name="QuestionBar" type="Sprite" parent="TextureBox"]
+position = Vector2( 0, 2 )
 z_index = -1
 texture = ExtResource( 3 )
 centered = false
+
 
 [editable path="questions/answer1"]
 
