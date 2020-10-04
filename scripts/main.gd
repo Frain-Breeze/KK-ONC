@@ -139,6 +139,10 @@ func next_round():
 func next_question():
 	currMode = MODE.QUESTION
 	currentQuestion+=1
+	if content[currentRound].questions.size() <= currentQuestion:
+		currMode = MODE.ROUNDEND
+		update_labels()
+		return
 	print("next question triggered")
 	update_labels()
 
@@ -149,10 +153,6 @@ func show_options():
 
 func answer_correct(team):
 	print("team " + str(team) + " has correctly answered the question")
-	if content[currentRound].questions.size() <= currentQuestion+1:
-		currMode = MODE.ROUNDEND
-		update_labels()
-		return
 	if(autoAdvanceQuestion):
 		next_question()
 
