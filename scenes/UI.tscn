@@ -13,13 +13,20 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
+[node name="resquestion" parent="questions" instance=ExtResource( 1 )]
+margin_left = 1055.49
+margin_top = 766.257
+margin_right = 1095.49
+margin_bottom = 806.257
+
 [node name="answer1" parent="questions" instance=ExtResource( 1 )]
+editor/display_folded = true
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = 490.0
-margin_top = 770.0
-margin_right = -1390.0
-margin_bottom = -270.0
+margin_left = 431.983
+margin_top = 799.887
+margin_right = -1448.02
+margin_bottom = -240.113
 
 [node name="text" parent="questions/answer1" index="0"]
 margin_left = 0.0
@@ -29,12 +36,13 @@ margin_bottom = 27.0
 text = "answ1"
 
 [node name="answer2" parent="questions" instance=ExtResource( 1 )]
+editor/display_folded = true
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_left = 1072.0
-margin_top = 780.0
+margin_top = 809.887
 margin_right = -808.0
-margin_bottom = -260.0
+margin_bottom = -230.113
 
 [node name="text" parent="questions/answer2" index="0"]
 margin_left = 66.6008
@@ -44,12 +52,13 @@ margin_bottom = 26.0453
 text = "answ2"
 
 [node name="answer3" parent="questions" instance=ExtResource( 1 )]
+editor/display_folded = true
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = 490.0
-margin_top = 926.0
-margin_right = -1390.0
-margin_bottom = -114.0
+margin_left = 435.499
+margin_top = 901.387
+margin_right = -1444.5
+margin_bottom = -138.613
 
 [node name="text" parent="questions/answer3" index="0"]
 margin_left = 5.60083
@@ -59,12 +68,13 @@ margin_bottom = 52.0453
 text = "answ3"
 
 [node name="answer4" parent="questions" instance=ExtResource( 1 )]
+editor/display_folded = true
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = 1069.0
-margin_top = 929.0
-margin_right = -811.0
-margin_bottom = -111.0
+margin_left = 1070.76
+margin_top = 904.387
+margin_right = -809.242
+margin_bottom = -135.613
 
 [node name="text" parent="questions/answer4" index="0"]
 margin_left = 69.6008
@@ -76,10 +86,10 @@ text = "answ4"
 [node name="question" parent="questions" instance=ExtResource( 1 )]
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = 669.956
-margin_top = 831.0
-margin_right = -1210.04
-margin_bottom = -209.0
+margin_left = 1055.02
+margin_top = 827.032
+margin_right = -824.975
+margin_bottom = -212.968
 
 [node name="TextureBox" type="Control" parent="."]
 anchor_right = 1.0

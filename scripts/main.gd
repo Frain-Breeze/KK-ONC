@@ -19,8 +19,12 @@ var csvFile = File.new()
 var currentRound = -1
 var currentQuestion = -1
 var rng = RandomNumberGenerator.new()
-var inAnswers = false
 var currMode = MODE.QUESTION
+
+var scT1 = 0
+var t1ans = []
+var scT2 = 0
+var t2ans = []
 
 func loadFile():
 	print(OS.get_user_data_dir())
@@ -96,38 +100,59 @@ enum MODE{
 	QUESTION,
 	ANSWER,
 	ROUNDEND,
-	RESULTS
+	RESULTS,
+	SHOWANSWERS
 }
 
-func clear_answers():
+func clear_all():
+	$UI/questions/question/text.text = ""
+	$UI/questions/resquestion/text.text = ""
 	$UI/questions/answer1/text.text = ""
 	$UI/questions/answer2/text.text = ""
 	$UI/questions/answer3/text.text = ""
 	$UI/questions/answer4/text.text = ""
 
 func update_labels():
-#	if(content.size() <= currentRound or content[currentRound].questions.size() <= currentQuestion):
-#		clear_answers()
-#		if(currentRound >= content.size()): 
-#			$UI/questions/question/text.text = "end of quiz"
-#		elif(currentRound >= content.size()-1):
-#			$UI/questions/question/text.text = "finale"
-#		else:
-#			$UI/questions/question/text.text = "moving on to round " + str(currentRound+2)
-#		return
 	
 	if(currMode == MODE.QUESTION):
-		clear_answers()
+		clear_all()
 		$UI/questions/question/text.text = content[currentRound].questions[currentQuestion].question
 	elif(currMode == MODE.ANSWER):
-		$UI/questions/answer1/text.text = content[currentRound].questions[currentQuestion].answer1
-		$UI/questions/answer2/text.text = content[currentRound].questions[currentQuestion].answer2
-		$UI/questions/answer3/text.text = content[currentRound].questions[currentQuestion].answer3
-		$UI/questions/answer4/text.text = content[currentRound].questions[currentQuestion].answer4
+		var CQ = content[currentRound].questions[currentQuestion]
+		$UI/questions/answer1/text.text = CQ.answer1
+		$UI/questions/answer2/text.text = CQ.answer2
+		$UI/questions/answer3/text.text = CQ.answer3
+		$UI/questions/answer4/text.text = CQ.answer4
 		$UI/questions/question/text.text = ""
 	elif(currMode == MODE.ROUNDEND):
-		clear_answers()
-		$UI/questions/question/text.text = "end of round"
+		clear_all()
+		$UI/questions/question/text.text = ""
+		$UI/questions/answer1/text.text = "score team 1: "+str(scT1)
+		$UI/questions/answer3/text.text = "score team 2: "+str(scT2)
+	elif(currMode == MODE.SHOWANSWERS):
+		clear_all()
+		var CA = content[currentRound].questions[currentQuestion%content[currentRound].questions.size()].correctAnswer
+		if CA == 1:
+			$UI/questions/resquestion/text.text = content[currentRound].questions[currentQuestion].answer1
+		elif CA == 2:
+			$UI/questions/resquestion/text.text = content[currentRound].questions[currentQuestion].answer2
+		elif CA == 3:
+			$UI/questions/resquestion/text.text = content[currentRound].questions[currentQuestion].answer3
+		elif CA == 4:
+			$UI/questions/resquestion/text.text = content[currentRound].questions[currentQuestion].answer4
+		
+		$UI/questions/answer1/text.text = "team 1:"
+		$UI/questions/answer2/text.text = "team 2:"
+		$UI/questions/answer3/text.text = t1ans[currentQuestion]
+		$UI/questions/answer4/text.text = t2ans[currentQuestion]
+
+func next_answer():
+	currentQuestion+=1
+	if(content[currentRound].questions.size() <= currentQuestion):
+		currMode = MODE.ROUNDEND
+		update_labels()
+	update_labels()
+	print("curr question" + str(currentQuestion))
 
 func next_round():
 	currMode = MODE.QUESTION
@@ -135,24 +160,37 @@ func next_round():
 	print("NEW ROUND TRIGGERED!")
 	currentRound+=1
 	update_labels()
+	print("curr round" + str(currentRound))
 
 func next_question():
 	currMode = MODE.QUESTION
 	currentQuestion+=1
 	if content[currentRound].questions.size() <= currentQuestion:
-		currMode = MODE.ROUNDEND
+		#currMode = MODE.ROUNDEND
+		currMode = MODE.SHOWANSWERS
+		currentQuestion = 0
 		update_labels()
+		print("ah yes")
 		return
 	print("next question triggered")
 	update_labels()
 
 func show_options():
 	currMode = MODE.ANSWER
-	print("show options triggered!")
+	print("show options triggered! ("+str(currentQuestion)+")")
 	update_labels()
 
-func answer_correct(team):
+func answer_correct(team, answer):
 	print("team " + str(team) + " has correctly answered the question")
+	if(team == 1):
+		scT1+=1
+		t1ans.append(answer)
+		t2ans.append("-")
+	elif(team == 2):
+		scT2+=1
+		t1ans.append("-")
+		t2ans.append(answer)
+	
 	if(autoAdvanceQuestion):
 		next_question()
 
@@ -162,33 +200,56 @@ func _process(delta):
 	
 	if currMode == MODE.ANSWER:
 		var CA = content[currentRound].questions[currentQuestion%content[currentRound].questions.size()].correctAnswer
+		var CAS = ""
+		var CQ = content[currentRound].questions[currentQuestion]
+		if CA == 1:
+			CAS = CQ.answer1
+		elif CA == 2:
+			CAS = CQ.answer2
+		elif CA == 3:
+			CAS = CQ.answer3
+		elif CA == 4:
+			CAS = CQ.answer4
+		
 		if Input.is_action_just_pressed("team1_button1") and CA == 1:
-			answer_correct(1)
+			answer_correct(1, CAS)
 		elif Input.is_action_just_pressed("team1_button2") and CA == 2:
-			answer_correct(1)
+			answer_correct(1, CAS)
 		elif Input.is_action_just_pressed("team1_button3") and CA == 3:
-			answer_correct(1)
+			answer_correct(1, CAS)
 		elif Input.is_action_just_pressed("team1_button4") and CA == 4:
-			answer_correct(1)
+			answer_correct(1, CAS)
 		
 		elif Input.is_action_just_pressed("team2_button1") and CA == 1:
-			answer_correct(2)
+			answer_correct(2, CAS)
 		elif Input.is_action_just_pressed("team2_button2") and CA == 2:
-			answer_correct(2)
+			answer_correct(2, CAS)
 		elif Input.is_action_just_pressed("team2_button3") and CA == 3:
-			answer_correct(2)
+			answer_correct(2, CAS)
 		elif Input.is_action_just_pressed("team2_button4") and CA == 4:
-			answer_correct(2)
+			answer_correct(2, CAS)
 	
 	if Input.is_action_just_pressed("advance"):
-		if(currMode == MODE.ANSWER):
+		if(currMode == MODE.SHOWANSWERS):
+			next_answer()
+			print("loli")
+		elif(currMode == MODE.ANSWER):
 			next_question()
+		elif(currMode == MODE.QUESTION):
+			show_options()
 		elif(currMode == MODE.ROUNDEND):
 			next_round()
-	else:
-		if Input.is_action_just_pressed("advance_round"):
-			next_round()
-		if Input.is_action_just_pressed("advance_question"):
-			show_options()
-		if Input.is_action_just_pressed("new_question"):
-			next_question()
+		
+#	else:
+#		if Input.is_action_just_pressed("advance_round"):
+#			next_round()
+#		if Input.is_action_just_pressed("advance_question"):
+#			show_options()
+#		if Input.is_action_just_pressed("new_question"):
+#			next_question()
+	
+	if Input.is_action_just_pressed("fullscreen"):
+		if OS.window_fullscreen:
+			OS.window_fullscreen = false
+		else:
+			OS.window_fullscreen = true

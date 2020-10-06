@@ -10,10 +10,10 @@ __meta__ = {
 }
 
 [node name="text" type="Label" parent="."]
-margin_left = 122.601
-margin_top = -40.9547
-margin_right = 650.601
-margin_bottom = 10.0453
+margin_left = -260.0
+margin_top = -20.0
+margin_right = 268.0
+margin_bottom = 31.0
 custom_fonts/font = ExtResource( 1 )
 text = "yes"
 align = 1
@@ -27,3 +27,4 @@ __meta__ = {
 visible = false
 margin_right = 40.0
 margin_bottom = 40.0
+
