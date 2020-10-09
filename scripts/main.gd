@@ -7,6 +7,8 @@ class QUESTION:
 	var answer4: String
 	var question: String
 	var correctAnswer
+	var t1ans: String
+	var t2ans: String
 
 class ROUND:
 	var questions = []
@@ -22,9 +24,7 @@ var rng = RandomNumberGenerator.new()
 var currMode = MODE.QUESTION
 
 var scT1 = 0
-var t1ans = []
 var scT2 = 0
-var t2ans = []
 
 func loadFile():
 	print(OS.get_user_data_dir())
@@ -90,13 +90,15 @@ func loadFile():
 func _ready():
 	rng.randomize()
 	loadFile()
+	currMode = MODE.STARTSCREEN
 	#emit_signal("NEW_ROUND", content[currentRound])
 	#currentRound+=1
-	next_round()
+	#next_round()
 	#next_question()
 
 
 enum MODE{
+	STARTSCREEN,
 	QUESTION,
 	ANSWER,
 	ROUNDEND,
@@ -143,8 +145,8 @@ func update_labels():
 		
 		$UI/questions/answer1/text.text = "team 1:"
 		$UI/questions/answer2/text.text = "team 2:"
-		$UI/questions/answer3/text.text = t1ans[currentQuestion]
-		$UI/questions/answer4/text.text = t2ans[currentQuestion]
+		$UI/questions/answer3/text.text = content[currentRound].questions[currentQuestion%content[currentRound].questions.size()].t1ans
+		$UI/questions/answer4/text.text = content[currentRound].questions[currentQuestion%content[currentRound].questions.size()].t2ans
 
 func next_answer():
 	currentQuestion+=1
@@ -180,16 +182,21 @@ func show_options():
 	print("show options triggered! ("+str(currentQuestion)+")")
 	update_labels()
 
+func answer_false(team, answer):
+	print("team " + str(team) + " has incorrectly answered the question")
+	if(team == 1):
+		content[currentRound].questions[currentQuestion%content[currentRound].questions.size()].t1ans = answer
+	if(team == 2):
+		content[currentRound].questions[currentQuestion%content[currentRound].questions.size()].t2ans = answer
+
 func answer_correct(team, answer):
 	print("team " + str(team) + " has correctly answered the question")
 	if(team == 1):
 		scT1+=1
-		t1ans.append(answer)
-		t2ans.append("-")
+		content[currentRound].questions[currentQuestion%content[currentRound].questions.size()].t1ans = answer
 	elif(team == 2):
 		scT2+=1
-		t1ans.append("-")
-		t2ans.append(answer)
+		content[currentRound].questions[currentQuestion%content[currentRound].questions.size()].t2ans = answer
 	
 	if(autoAdvanceQuestion):
 		next_question()
@@ -211,28 +218,54 @@ func _process(delta):
 		elif CA == 4:
 			CAS = CQ.answer4
 		
-		if Input.is_action_just_pressed("team1_button1") and CA == 1:
-			answer_correct(1, CAS)
-		elif Input.is_action_just_pressed("team1_button2") and CA == 2:
-			answer_correct(1, CAS)
-		elif Input.is_action_just_pressed("team1_button3") and CA == 3:
-			answer_correct(1, CAS)
-		elif Input.is_action_just_pressed("team1_button4") and CA == 4:
-			answer_correct(1, CAS)
+		if Input.is_action_just_pressed("team1_button1"):
+			if CA == 1:
+				answer_correct(1, CAS)
+			else:
+				answer_false(1, CAS)
+		elif Input.is_action_just_pressed("team1_button2"): 
+			if CA == 2:
+				answer_correct(1, CAS)
+			else:
+				answer_false(1, CAS)
+		elif Input.is_action_just_pressed("team1_button3"):
+			if CA == 3:
+				answer_correct(1, CAS)
+			else:
+				answer_false(1, CAS)
+		elif Input.is_action_just_pressed("team1_button4"):
+			if CA == 4:
+				answer_correct(1, CAS)
+			else:
+				answer_false(1, CAS)
 		
-		elif Input.is_action_just_pressed("team2_button1") and CA == 1:
-			answer_correct(2, CAS)
-		elif Input.is_action_just_pressed("team2_button2") and CA == 2:
-			answer_correct(2, CAS)
-		elif Input.is_action_just_pressed("team2_button3") and CA == 3:
-			answer_correct(2, CAS)
-		elif Input.is_action_just_pressed("team2_button4") and CA == 4:
-			answer_correct(2, CAS)
+		elif Input.is_action_just_pressed("team2_button1"): 
+			if CA == 1:
+				answer_correct(2, CAS)
+			else:
+				answer_false(2, CAS)
+		elif Input.is_action_just_pressed("team2_button2"):
+			if CA == 2:
+				answer_correct(2, CAS)
+			else:
+				answer_false(2, CAS)
+		elif Input.is_action_just_pressed("team2_button3"):
+			if CA == 3:
+				answer_correct(2, CAS)
+			else:
+				answer_false(2, CAS)
+		elif Input.is_action_just_pressed("team2_button4"):
+			if CA == 4:
+				answer_correct(2, CAS)
+			else:
+				answer_false(2, CAS)
 	
 	if Input.is_action_just_pressed("advance"):
-		if(currMode == MODE.SHOWANSWERS):
+		if(currMode == MODE.STARTSCREEN):
+			$"UI/TextureBox/KK-splash".visible = false
+			next_round()
+		elif(currMode == MODE.SHOWANSWERS):
 			next_answer()
-			print("loli")
 		elif(currMode == MODE.ANSWER):
 			next_question()
 		elif(currMode == MODE.QUESTION):
