@@ -7,8 +7,8 @@ class QUESTION:
 	var answer4: String
 	var question: String
 	var correctAnswer
-	var t1ans: String
-	var t2ans: String
+	var t1ans
+	var t2ans
 
 class ROUND:
 	var questions = []
@@ -29,7 +29,7 @@ var scT2 = 0
 func loadFile():
 	print(OS.get_user_data_dir())
 	print(OS.get_executable_path())
-	print(csvFile.open("res://questions/loli.csv", File.READ))
+	print(csvFile.open("res://questions/kk-vragen.csv", File.READ))
 	
 	var inRound = false
 	var tRound = ROUND.new()
@@ -102,21 +102,23 @@ enum MODE{
 	QUESTION,
 	ANSWER,
 	ROUNDEND,
+	INBETWEEN,
 	RESULTS,
-	SHOWANSWERS
+	SHOWANSWERS,
+	END
 }
 
 func clear_all():
 	$UI/questions/question/text.text = ""
 	$UI/questions/resquestion/text.text = ""
 	$UI/questions/answer1/text.text = ""
-	$UI/questions/answer1/text.modulate = Color(0.0, 0.0, 0.0)
+	$UI/questions/answer1/text.modulate = Color(1.0, 1.0, 1.0)
 	$UI/questions/answer2/text.text = ""
-	$UI/questions/answer2/text.modulate = Color(0.0, 0.0, 0.0)
+	$UI/questions/answer2/text.modulate = Color(1.0, 1.0, 1.0)
 	$UI/questions/answer3/text.text = ""
-	$UI/questions/answer3/text.modulate = Color(0.0, 0.0, 0.0)
+	$UI/questions/answer3/text.modulate = Color(1.0, 1.0, 1.0)
 	$UI/questions/answer4/text.text = ""
-	$UI/questions/answer4/text.modulate = Color(0.0, 0.0, 0.0)
+	$UI/questions/answer4/text.modulate = Color(1.0, 1.0, 1.0)
 
 func update_labels():
 	
@@ -130,11 +132,14 @@ func update_labels():
 		$UI/questions/answer3/text.text = CQ.answer3
 		$UI/questions/answer4/text.text = CQ.answer4
 		$UI/questions/question/text.text = ""
-	elif(currMode == MODE.ROUNDEND):
+	elif(currMode == MODE.INBETWEEN):
 		clear_all()
 		$UI/questions/question/text.text = ""
 		$UI/questions/answer1/text.text = "score team 1: "+str(scT1)
 		$UI/questions/answer3/text.text = "score team 2: "+str(scT2)
+	elif(currMode == MODE.ROUNDEND):
+		clear_all()
+		$UI/questions/question/text.text = "einde van " + content[currentRound].roundName
 	elif(currMode == MODE.SHOWANSWERS):
 		clear_all()
 #		var CA = content[currentRound].questions[currentQuestion%content[currentRound].questions.size()].correctAnswer
@@ -148,15 +153,45 @@ func update_labels():
 #			$UI/questions/resquestion/text.text = content[currentRound].questions[currentQuestion].answer4
 		$UI/questions/resquestion/text.text = content[currentRound].questions[currentQuestion].question
 		
+		var t1ansInt = content[currentRound].questions[currentQuestion].t1ans
+		var t2ansInt = content[currentRound].questions[currentQuestion].t2ans
+		
+		if t1ansInt == content[currentRound].questions[currentQuestion].correctAnswer:
+			$UI/questions/answer4/text.modulate = Color(0.5, 0.5, 0.5)
+		elif t2ansInt == content[currentRound].questions[currentQuestion].correctAnswer:
+			$UI/questions/answer3/text.modulate = Color(0.5, 0.5, 0.5)
+		
 		$UI/questions/answer1/text.text = "team 1:"
+		if t1ansInt == 1:
+			$UI/questions/answer3/text.text = content[currentRound].questions[currentQuestion].answer1
+		elif t1ansInt == 2:
+			$UI/questions/answer3/text.text = content[currentRound].questions[currentQuestion].answer2
+		elif t1ansInt == 3:
+			$UI/questions/answer3/text.text = content[currentRound].questions[currentQuestion].answer3
+		elif t1ansInt == 4:
+			$UI/questions/answer3/text.text = content[currentRound].questions[currentQuestion].answer4
+		
 		$UI/questions/answer2/text.text = "team 2:"
-		$UI/questions/answer3/text.text = content[currentRound].questions[currentQuestion%content[currentRound].questions.size()].t1ans
-		$UI/questions/answer4/text.text = content[currentRound].questions[currentQuestion%content[currentRound].questions.size()].t2ans
+		if t2ansInt == 1:
+			$UI/questions/answer4/text.text = content[currentRound].questions[currentQuestion].answer1
+		elif t2ansInt == 2:
+			$UI/questions/answer4/text.text = content[currentRound].questions[currentQuestion].answer2
+		elif t2ansInt == 3:
+			$UI/questions/answer4/text.text = content[currentRound].questions[currentQuestion].answer3
+		elif t2ansInt == 4:
+			$UI/questions/answer4/text.text = content[currentRound].questions[currentQuestion].answer4
+	elif(currMode == MODE.END):
+		clear_all()
+		$UI/questions/question/text.text = "einde van de quiz"
+		
+		
+		#$UI/questions/answer3/text.text = content[currentRound].questions[currentQuestion]
+		#$UI/questions/answer4/text.text = content[currentRound].questions[currentQuestion%content[currentRound].questions.size()].t2ans
 
 func next_answer():
 	currentQuestion+=1
 	if(content[currentRound].questions.size() <= currentQuestion):
-		currMode = MODE.ROUNDEND
+		currMode = MODE.INBETWEEN
 		update_labels()
 	update_labels()
 	print("curr question" + str(currentQuestion))
@@ -166,6 +201,10 @@ func next_round():
 	currentQuestion = 0
 	print("NEW ROUND TRIGGERED!")
 	currentRound+=1
+	if currentRound >= content.size():
+		currMode = MODE.END
+		update_labels()
+		return
 	update_labels()
 	print("curr round" + str(currentRound))
 
@@ -173,13 +212,15 @@ func next_question():
 	currMode = MODE.QUESTION
 	currentQuestion+=1
 	if content[currentRound].questions.size() <= currentQuestion:
-		#currMode = MODE.ROUNDEND
-		currMode = MODE.SHOWANSWERS
-		currentQuestion = 0
-		update_labels()
-		print("ah yes")
+		end_of_round()
 		return
 	print("next question triggered")
+	update_labels()
+
+func end_of_round():
+	currMode = MODE.ROUNDEND
+	currentQuestion = -1
+	print("end of round triggered!")
 	update_labels()
 
 func show_options():
@@ -216,45 +257,45 @@ func _process(delta):
 		
 		if Input.is_action_just_pressed("team1_button1"):
 			if CA == 1:
-				answer_correct(1, content[currentRound].questions[currentQuestion].answer1)
+				answer_correct(1, 1)
 			else:
-				answer_false(1, content[currentRound].questions[currentQuestion].answer1)
+				answer_false(1, 1)
 		elif Input.is_action_just_pressed("team1_button2"): 
 			if CA == 2:
-				answer_correct(1, content[currentRound].questions[currentQuestion].answer2)
+				answer_correct(1, 2)
 			else:
-				answer_false(1, content[currentRound].questions[currentQuestion].answer2)
+				answer_false(1, 2)
 		elif Input.is_action_just_pressed("team1_button3"):
 			if CA == 3:
-				answer_correct(1, content[currentRound].questions[currentQuestion].answer3)
+				answer_correct(1, 3)
 			else:
-				answer_false(1, content[currentRound].questions[currentQuestion].answer3)
+				answer_false(1, 3)
 		elif Input.is_action_just_pressed("team1_button4"):
 			if CA == 4:
-				answer_correct(1, content[currentRound].questions[currentQuestion].answer4)
+				answer_correct(1, 4)
 			else:
-				answer_false(1, content[currentRound].questions[currentQuestion].answer4)
+				answer_false(1, 4)
 		
 		elif Input.is_action_just_pressed("team2_button1"): 
 			if CA == 1:
-				answer_correct(2, content[currentRound].questions[currentQuestion].answer1)
+				answer_correct(2, 1)
 			else:
-				answer_false(2, content[currentRound].questions[currentQuestion].answer1)
+				answer_false(2, 1)
 		elif Input.is_action_just_pressed("team2_button2"):
 			if CA == 2:
-				answer_correct(2, content[currentRound].questions[currentQuestion].answer2)
+				answer_correct(2, 2)
 			else:
-				answer_false(2, content[currentRound].questions[currentQuestion].answer2)
+				answer_false(2, 2)
 		elif Input.is_action_just_pressed("team2_button3"):
 			if CA == 3:
-				answer_correct(2, content[currentRound].questions[currentQuestion].answer3)
+				answer_correct(2, 3)
 			else:
-				answer_false(2, content[currentRound].questions[currentQuestion].answer3)
+				answer_false(2, 3)
 		elif Input.is_action_just_pressed("team2_button4"):
 			if CA == 4:
-				answer_correct(2, content[currentRound].questions[currentQuestion].answer4)
+				answer_correct(2, 4)
 			else:
-				answer_false(2, content[currentRound].questions[currentQuestion].answer4)
+				answer_false(2, 4)
 	
 	if Input.is_action_just_pressed("advance"):
 		if(currMode == MODE.STARTSCREEN):
@@ -267,6 +308,9 @@ func _process(delta):
 		elif(currMode == MODE.QUESTION):
 			show_options()
 		elif(currMode == MODE.ROUNDEND):
+			currMode = MODE.SHOWANSWERS
+			next_answer()
+		elif(currMode == MODE.INBETWEEN):
 			next_round()
 		
 #	else:
