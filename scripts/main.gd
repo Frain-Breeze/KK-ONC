@@ -15,21 +15,42 @@ class ROUND:
 	var roundName: String
 
 export var autoAdvanceQuestion: bool
+export var questionfile = "res://questions/loli.csv"
+export var namefile = "res://questions/teamnames.txt"
 
 var content = []
 var csvFile = File.new()
+var nameFile = File.new()
 var currentRound = -1
 var currentQuestion = -1
 var rng = RandomNumberGenerator.new()
 var currMode = MODE.QUESTION
 
+var t1names = []
+var t2names = []
+
 var scT1 = 0
 var scT2 = 0
 
 func loadFile():
+	
+	var t2 = false
+	nameFile.open(namefile, File.READ)
+	while !nameFile.eof_reached():
+		var tmp = nameFile.get_line()
+		print(tmp)
+		if tmp == "":
+			t2 = true
+			continue
+		if !t2:
+			t1names.append(tmp)
+		else:
+			t2names.append(tmp)
+	nameFile.close()
+	
 	print(OS.get_user_data_dir())
 	print(OS.get_executable_path())
-	print(csvFile.open("res://questions/kk-vragen.csv", File.READ))
+	print(csvFile.open(questionfile, File.READ))
 	
 	var inRound = false
 	var tRound = ROUND.new()
@@ -84,6 +105,8 @@ func loadFile():
 			tRound.questions.append(tQuest)
 			tQuest = QUESTION.new()
 	
+	csvFile.close()
+	
 	if(inRound): #if we reached the end of the file without finishing the last round
 		content.append(tRound)
 
@@ -98,7 +121,9 @@ func _ready():
 
 
 enum MODE{
-	STARTSCREEN,
+	STARTSCREEN = 0,
+	INTRODUCTION1,
+	INTRODUCTION2,
 	QUESTION,
 	ANSWER,
 	ROUNDEND,
@@ -122,7 +147,17 @@ func clear_all():
 
 func update_labels():
 	
-	if(currMode == MODE.QUESTION):
+	if(currMode == MODE.INTRODUCTION1):
+		clear_all()
+		$UI/questions/answer1/text.text = "namen team 1:"
+		for name in t1names:
+			$UI/questions/answer3/text.text += name + " "
+	elif(currMode == MODE.INTRODUCTION2):
+		clear_all()
+		$UI/questions/answer1/text.text = "namen team 2:"
+		for name in t2names:
+			$UI/questions/answer3/text.text += name + " "
+	elif(currMode == MODE.QUESTION):
 		clear_all()
 		$UI/questions/question/text.text = content[currentRound].questions[currentQuestion].question
 	elif(currMode == MODE.ANSWER):
@@ -300,6 +335,13 @@ func _process(delta):
 	if Input.is_action_just_pressed("advance"):
 		if(currMode == MODE.STARTSCREEN):
 			$"UI/TextureBox/KK-splash".visible = false
+			currMode = MODE.INTRODUCTION1
+			update_labels()
+		elif(currMode == MODE.INTRODUCTION1):
+			currMode = MODE.INTRODUCTION2
+			update_labels()
+		elif(currMode == MODE.INTRODUCTION2):
+			currMode = MODE.QUESTION
 			next_round()
 		elif(currMode == MODE.SHOWANSWERS):
 			next_answer()
@@ -312,7 +354,9 @@ func _process(delta):
 			next_answer()
 		elif(currMode == MODE.INBETWEEN):
 			next_round()
-		
+		else:
+			print("what")
+			breakpoint
 #	else:
 #		if Input.is_action_just_pressed("advance_round"):
 #			next_round()
