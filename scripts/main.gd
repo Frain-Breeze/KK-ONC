@@ -15,7 +15,8 @@ class ROUND:
 	var roundName: String
 
 export var autoAdvanceQuestion: bool
-export var questionfile = "res://questions/loli.csv"
+#export var questionfile = "res://questions/kk-vragen-nieuw.csv"
+export var questionfile = "res://questions/kk_test.csv"
 export var namefile = "res://questions/teamnames.txt"
 
 var content = []
@@ -26,6 +27,7 @@ var currentQuestion = -1
 var rng = RandomNumberGenerator.new()
 var currMode = MODE.QUESTION
 
+var presname = ""
 var t1names = []
 var t2names = []
 
@@ -34,18 +36,20 @@ var scT2 = 0
 
 func loadFile():
 	
-	var t2 = false
+	var mode = 0
 	nameFile.open(namefile, File.READ)
 	while !nameFile.eof_reached():
 		var tmp = nameFile.get_line()
 		print(tmp)
 		if tmp == "":
-			t2 = true
+			mode += 1
 			continue
-		if !t2:
+		if mode == 1:
 			t1names.append(tmp)
-		else:
+		elif mode == 2:
 			t2names.append(tmp)
+		else:
+			presname = tmp
 	nameFile.close()
 	
 	print(OS.get_user_data_dir())
@@ -70,36 +74,58 @@ func loadFile():
 			tRound.roundName = cstr[0]
 		elif(inRound): #this line has questions
 			tQuest.question = cstr[0]
-			var array = [0,1,2,3]
-			#var yes = array[rng.randi()%array.size()]
-			var yes = rng.randi_range(0,3)
-			#var yes = 4
-			#tQuest.correctAnswer = cstr[1]
+			
+			var corrAns = 0
+			
+			for n in range(1, 5):
+				if cstr[n][0] == '*':
+					corrAns = n
+			
+			print("correct answer is: " + cstr[corrAns])
+			tQuest.correctAnswer = corrAns
+			
+			tQuest.answer1 = cstr[1].replace("*", "")
+			tQuest.answer2 = cstr[2].replace("*", "")
+			tQuest.answer3 = cstr[3].replace("*", "")
+			tQuest.answer4 = cstr[4].replace("*", "")
+			
+			
+			
 			print("str1 " + cstr[1])
 			print("str2 " + cstr[2])
 			print("str3 " + cstr[3])
 			print("str4 " + cstr[4])
-			tQuest.answer1 = cstr[1+((yes+0)%array.size())]
-			tQuest.answer2 = cstr[1+((yes+1)%array.size())]
-			tQuest.answer3 = cstr[1+((yes+2)%array.size())]
-			tQuest.answer4 = cstr[1+((yes+3)%array.size())]
-			print("strR1 " + tQuest.answer1)
-			print("strR2 " + tQuest.answer2)
-			print("strR3 " + tQuest.answer3)
-			print("strR4 " + tQuest.answer4)
-			print("rnd was: " + str(yes))
 			
-			if(yes == 0):
-				tQuest.correctAnswer = 1
-			elif(yes == 1):
-				tQuest.correctAnswer = 4
-			elif(yes == 2):
-				tQuest.correctAnswer = 3
-			elif(yes == 3):
-				tQuest.correctAnswer = 2
-			else:
-				breakpoint #that's not quite right
-			print("evaluated correct answer: " + str(tQuest.correctAnswer))
+#			var array = [0,1,2,3]
+#			#var yes = array[rng.randi()%array.size()]
+#			var yes = rng.randi_range(0,3)
+#			#var yes = 4
+#			#tQuest.correctAnswer = cstr[1]
+#			print("str1 " + cstr[1])
+#			print("str2 " + cstr[2])
+#			print("str3 " + cstr[3])
+#			print("str4 " + cstr[4])
+#			tQuest.answer1 = cstr[1+((yes+0)%array.size())]
+#			tQuest.answer2 = cstr[1+((yes+1)%array.size())]
+#			tQuest.answer3 = cstr[1+((yes+2)%array.size())]
+#			tQuest.answer4 = cstr[1+((yes+3)%array.size())]
+#			print("strR1 " + tQuest.answer1)
+#			print("strR2 " + tQuest.answer2)
+#			print("strR3 " + tQuest.answer3)
+#			print("strR4 " + tQuest.answer4)
+#			print("rnd was: " + str(yes))
+#
+#			if(yes == 0):
+#				tQuest.correctAnswer = 1
+#			elif(yes == 1):
+#				tQuest.correctAnswer = 4
+#			elif(yes == 2):
+#				tQuest.correctAnswer = 3
+#			elif(yes == 3):
+#				tQuest.correctAnswer = 2
+#			else:
+#				breakpoint #that's not quite right
+#			print("evaluated correct answer: " + str(tQuest.correctAnswer))
 			#print("correctAnswer to ^: " + str(tQuest.correctAnswer+1))
 			#tRound.questions.append(tQuest)
 			tRound.questions.append(tQuest)
@@ -113,6 +139,7 @@ func loadFile():
 func _ready():
 	rng.randomize()
 	loadFile()
+	clear_all()
 	currMode = MODE.STARTSCREEN
 	#emit_signal("NEW_ROUND", content[currentRound])
 	#currentRound+=1
@@ -121,9 +148,12 @@ func _ready():
 
 
 enum MODE{
-	STARTSCREEN = 0,
+	STARTSCREEN,
+	INTRODUCTIONPRES,
 	INTRODUCTION1,
 	INTRODUCTION2,
+	EMPTYSTART,
+	ROUNDBEGIN,
 	QUESTION,
 	ANSWER,
 	ROUNDEND,
@@ -134,6 +164,7 @@ enum MODE{
 }
 
 func clear_all():
+	$UI/TextureBox/QuestionBar.visible = true
 	$UI/questions/question/text.text = ""
 	$UI/questions/resquestion/text.text = ""
 	$UI/questions/answer1/text.text = ""
@@ -147,19 +178,30 @@ func clear_all():
 
 func update_labels():
 	
-	if(currMode == MODE.INTRODUCTION1):
+	if(currMode == MODE.INTRODUCTIONPRES):
 		clear_all()
-		$UI/questions/answer1/text.text = "namen team 1:"
+		$UI/questions/resquestion/text.text = "presentator:"
+		$UI/questions/question/text.text = presname
+	elif(currMode == MODE.INTRODUCTION1):
+		clear_all()
+		$UI/questions/resquestion/text.text = "team blauw:"
 		for name in t1names:
-			$UI/questions/answer3/text.text += name + " "
+			$UI/questions/question/text.text += name + " "
 	elif(currMode == MODE.INTRODUCTION2):
 		clear_all()
-		$UI/questions/answer1/text.text = "namen team 2:"
+		$UI/questions/resquestion/text.text = "team rood:"
 		for name in t2names:
-			$UI/questions/answer3/text.text += name + " "
+			$UI/questions/question/text.text += name + " "
+	elif(currMode == MODE.EMPTYSTART):
+		clear_all()
+		$UI/TextureBox/QuestionBar.visible = false
+	elif(currMode == MODE.ROUNDBEGIN):
+		clear_all()
+		$UI/questions/question/text.text = content[currentRound].roundName
 	elif(currMode == MODE.QUESTION):
 		clear_all()
-		$UI/questions/question/text.text = content[currentRound].questions[currentQuestion].question
+		if not (content[currentRound].questions.size() <= currentQuestion):
+			$UI/questions/question/text.text = content[currentRound].questions[currentQuestion].question
 	elif(currMode == MODE.ANSWER):
 		var CQ = content[currentRound].questions[currentQuestion]
 		$UI/questions/answer1/text.text = CQ.answer1
@@ -170,8 +212,8 @@ func update_labels():
 	elif(currMode == MODE.INBETWEEN):
 		clear_all()
 		$UI/questions/question/text.text = ""
-		$UI/questions/answer1/text.text = "score team 1: "+str(scT1)
-		$UI/questions/answer3/text.text = "score team 2: "+str(scT2)
+		$UI/questions/answer1/text.text = "score team blauw: "+str(scT1)
+		$UI/questions/answer3/text.text = "score team rood: "+str(scT2)
 	elif(currMode == MODE.ROUNDEND):
 		clear_all()
 		$UI/questions/question/text.text = "einde van " + content[currentRound].roundName
@@ -196,25 +238,25 @@ func update_labels():
 		elif t2ansInt == content[currentRound].questions[currentQuestion].correctAnswer:
 			$UI/questions/answer3/text.modulate = Color(0.5, 0.5, 0.5)
 		
-		$UI/questions/answer1/text.text = "team 1:"
+		$UI/questions/answer3/text.text = "team blauw: "
 		if t1ansInt == 1:
-			$UI/questions/answer3/text.text = content[currentRound].questions[currentQuestion].answer1
+			$UI/questions/answer3/text.text += content[currentRound].questions[currentQuestion].answer1
 		elif t1ansInt == 2:
-			$UI/questions/answer3/text.text = content[currentRound].questions[currentQuestion].answer2
+			$UI/questions/answer3/text.text += content[currentRound].questions[currentQuestion].answer2
 		elif t1ansInt == 3:
-			$UI/questions/answer3/text.text = content[currentRound].questions[currentQuestion].answer3
+			$UI/questions/answer3/text.text += content[currentRound].questions[currentQuestion].answer3
 		elif t1ansInt == 4:
-			$UI/questions/answer3/text.text = content[currentRound].questions[currentQuestion].answer4
+			$UI/questions/answer3/text.text += content[currentRound].questions[currentQuestion].answer4
 		
-		$UI/questions/answer2/text.text = "team 2:"
+		$UI/questions/answer4/text.text = "team rood: "
 		if t2ansInt == 1:
-			$UI/questions/answer4/text.text = content[currentRound].questions[currentQuestion].answer1
+			$UI/questions/answer4/text.text += content[currentRound].questions[currentQuestion].answer1
 		elif t2ansInt == 2:
-			$UI/questions/answer4/text.text = content[currentRound].questions[currentQuestion].answer2
+			$UI/questions/answer4/text.text += content[currentRound].questions[currentQuestion].answer2
 		elif t2ansInt == 3:
-			$UI/questions/answer4/text.text = content[currentRound].questions[currentQuestion].answer3
+			$UI/questions/answer4/text.text += content[currentRound].questions[currentQuestion].answer3
 		elif t2ansInt == 4:
-			$UI/questions/answer4/text.text = content[currentRound].questions[currentQuestion].answer4
+			$UI/questions/answer4/text.text += content[currentRound].questions[currentQuestion].answer4
 	elif(currMode == MODE.END):
 		clear_all()
 		$UI/questions/question/text.text = "einde van de quiz"
@@ -335,18 +377,28 @@ func _process(delta):
 	if Input.is_action_just_pressed("advance"):
 		if(currMode == MODE.STARTSCREEN):
 			$"UI/TextureBox/KK-splash".visible = false
+			currMode = MODE.INTRODUCTIONPRES
+			update_labels()
+		elif(currMode == MODE.INTRODUCTIONPRES):
 			currMode = MODE.INTRODUCTION1
 			update_labels()
 		elif(currMode == MODE.INTRODUCTION1):
 			currMode = MODE.INTRODUCTION2
 			update_labels()
 		elif(currMode == MODE.INTRODUCTION2):
-			currMode = MODE.QUESTION
+			currMode = MODE.EMPTYSTART
+			update_labels()
+		elif(currMode == MODE.EMPTYSTART):
 			next_round()
+			currMode = MODE.ROUNDBEGIN
+			update_labels()
+		elif(currMode == MODE.ROUNDBEGIN):
+			currMode = MODE.QUESTION
+			update_labels()
 		elif(currMode == MODE.SHOWANSWERS):
 			next_answer()
 		elif(currMode == MODE.ANSWER):
-			next_question()
+			pass #next_question()
 		elif(currMode == MODE.QUESTION):
 			show_options()
 		elif(currMode == MODE.ROUNDEND):
@@ -354,6 +406,8 @@ func _process(delta):
 			next_answer()
 		elif(currMode == MODE.INBETWEEN):
 			next_round()
+			currMode = MODE.ROUNDBEGIN
+			update_labels()
 		else:
 			print("what")
 			breakpoint

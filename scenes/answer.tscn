@@ -2,23 +2,21 @@
 
 [ext_resource path="res://assets/Greyscale Basic/GB_bold.tres" type="DynamicFont" id=1]
 
-[node name="answer" type="Control"]
-margin_right = 40.0
-margin_bottom = 40.0
-__meta__ = {
-"_edit_use_anchors_": false
-}
+[node name="answer" type="CenterContainer"]
+margin_right = 309.0
+margin_bottom = 51.0
+use_top_left = true
 
 [node name="text" type="Label" parent="."]
-margin_left = -260.0
-margin_top = -20.0
-margin_right = 268.0
-margin_bottom = 31.0
+margin_left = -550.0
+margin_top = -26.0
+margin_right = 550.0
+margin_bottom = 25.0
+rect_min_size = Vector2( 1100, 0 )
 custom_fonts/font = ExtResource( 1 )
-text = "yes"
 align = 1
-valign = 1
 autowrap = true
+percent_visible = 4.16667
 __meta__ = {
 "_edit_use_anchors_": false
 }

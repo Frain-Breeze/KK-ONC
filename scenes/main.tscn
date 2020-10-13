@@ -8,3 +8,30 @@ script = ExtResource( 1 )
 autoAdvanceQuestion = true
 
 [node name="UI" parent="." instance=ExtResource( 2 )]
+
+[node name="answer1" parent="UI/questions" index="1"]
+margin_left = 664.523
+margin_top = 840.0
+margin_right = -1215.48
+margin_bottom = -135.0
+
+[node name="answer2" parent="UI/questions" index="2"]
+margin_left = 1398.88
+margin_top = 840.0
+margin_right = -481.123
+margin_bottom = -135.0
+
+[node name="answer3" parent="UI/questions" index="3"]
+margin_left = 669.26
+margin_top = 923.305
+margin_right = -1210.74
+margin_bottom = -51.6946
+
+[node name="answer4" parent="UI/questions" index="4"]
+margin_left = 1398.88
+margin_top = 923.305
+margin_right = -481.125
+margin_bottom = -51.6946
+
+
+[editable path="UI"]
