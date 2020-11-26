@@ -78,11 +78,14 @@ func loadFile():
 		elif(inRound): #this line has questions
 			tQuest.question = cstr[0]
 			
-			var corrAns = 0
+			var corrAns = -1
 			
 			for n in range(1, 5):
 				if cstr[n][0] == '*':
 					corrAns = n
+			
+			if corrAns == -1:
+				breakpoint #file is incorrect!
 			
 			print("correct answer is: " + cstr[corrAns])
 			tQuest.correctAnswer = corrAns
