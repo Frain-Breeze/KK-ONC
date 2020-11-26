@@ -34,6 +34,9 @@ var t2names = []
 var scT1 = 0
 var scT2 = 0
 
+var t1answered = false
+var t2answered = false
+
 func loadFile():
 	
 	var mode = 0
@@ -95,39 +98,7 @@ func loadFile():
 			print("str2 " + cstr[2])
 			print("str3 " + cstr[3])
 			print("str4 " + cstr[4])
-			
-#			var array = [0,1,2,3]
-#			#var yes = array[rng.randi()%array.size()]
-#			var yes = rng.randi_range(0,3)
-#			#var yes = 4
-#			#tQuest.correctAnswer = cstr[1]
-#			print("str1 " + cstr[1])
-#			print("str2 " + cstr[2])
-#			print("str3 " + cstr[3])
-#			print("str4 " + cstr[4])
-#			tQuest.answer1 = cstr[1+((yes+0)%array.size())]
-#			tQuest.answer2 = cstr[1+((yes+1)%array.size())]
-#			tQuest.answer3 = cstr[1+((yes+2)%array.size())]
-#			tQuest.answer4 = cstr[1+((yes+3)%array.size())]
-#			print("strR1 " + tQuest.answer1)
-#			print("strR2 " + tQuest.answer2)
-#			print("strR3 " + tQuest.answer3)
-#			print("strR4 " + tQuest.answer4)
-#			print("rnd was: " + str(yes))
-#
-#			if(yes == 0):
-#				tQuest.correctAnswer = 1
-#			elif(yes == 1):
-#				tQuest.correctAnswer = 4
-#			elif(yes == 2):
-#				tQuest.correctAnswer = 3
-#			elif(yes == 3):
-#				tQuest.correctAnswer = 2
-#			else:
-#				breakpoint #that's not quite right
-#			print("evaluated correct answer: " + str(tQuest.correctAnswer))
-			#print("correctAnswer to ^: " + str(tQuest.correctAnswer+1))
-			#tRound.questions.append(tQuest)
+
 			tRound.questions.append(tQuest)
 			tQuest = QUESTION.new()
 	
@@ -219,24 +190,15 @@ func update_labels():
 		$UI/questions/question/text.text = "einde van " + content[currentRound].roundName
 	elif(currMode == MODE.SHOWANSWERS):
 		clear_all()
-#		var CA = content[currentRound].questions[currentQuestion%content[currentRound].questions.size()].correctAnswer
-#		if CA == 1:
-#			$UI/questions/resquestion/text.text = content[currentRound].questions[currentQuestion].answer1
-#		elif CA == 2:
-#			$UI/questions/resquestion/text.text = content[currentRound].questions[currentQuestion].answer2
-#		elif CA == 3:
-#			$UI/questions/resquestion/text.text = content[currentRound].questions[currentQuestion].answer3
-#		elif CA == 4:
-#			$UI/questions/resquestion/text.text = content[currentRound].questions[currentQuestion].answer4
 		$UI/questions/resquestion/text.text = content[currentRound].questions[currentQuestion].question
 		
 		var t1ansInt = content[currentRound].questions[currentQuestion].t1ans
 		var t2ansInt = content[currentRound].questions[currentQuestion].t2ans
 		
-		if t1ansInt == content[currentRound].questions[currentQuestion].correctAnswer:
-			$UI/questions/answer4/text.modulate = Color(0.5, 0.5, 0.5)
-		elif t2ansInt == content[currentRound].questions[currentQuestion].correctAnswer:
+		if t1ansInt != content[currentRound].questions[currentQuestion].correctAnswer:
 			$UI/questions/answer3/text.modulate = Color(0.5, 0.5, 0.5)
+		if t2ansInt != content[currentRound].questions[currentQuestion].correctAnswer:
+			$UI/questions/answer4/text.modulate = Color(0.5, 0.5, 0.5)
 		
 		$UI/questions/answer3/text.text = "team blauw: "
 		if t1ansInt == 1:
@@ -286,6 +248,8 @@ func next_round():
 	print("curr round" + str(currentRound))
 
 func next_question():
+	t1answered = false
+	t2answered = false
 	currMode = MODE.QUESTION
 	currentQuestion+=1
 	if content[currentRound].questions.size() <= currentQuestion:
@@ -309,8 +273,10 @@ func answer_false(team, answer):
 	print("team " + str(team) + " has incorrectly answered the question")
 	if(team == 1):
 		content[currentRound].questions[currentQuestion%content[currentRound].questions.size()].t1ans = answer
+		t1answered = true
 	elif(team == 2):
 		content[currentRound].questions[currentQuestion%content[currentRound].questions.size()].t2ans = answer
+		t2answered = true
 
 func answer_correct(team, answer):
 	print("team " + str(team) + " has correctly answered the question")
@@ -329,50 +295,54 @@ func _process(delta):
 		print("correct answer: " + str(content[currentRound].questions[currentQuestion].correctAnswer))
 	
 	if currMode == MODE.ANSWER:
+		if t1answered == true and t2answered == true:
+			next_question()
+		
 		var CA = content[currentRound].questions[currentQuestion%content[currentRound].questions.size()].correctAnswer
 		var CQ = content[currentRound].questions[currentQuestion]
-		
-		if Input.is_action_just_pressed("team1_button1"):
-			if CA == 1:
-				answer_correct(1, 1)
-			else:
-				answer_false(1, 1)
-		elif Input.is_action_just_pressed("team1_button2"): 
-			if CA == 2:
-				answer_correct(1, 2)
-			else:
-				answer_false(1, 2)
-		elif Input.is_action_just_pressed("team1_button3"):
-			if CA == 3:
-				answer_correct(1, 3)
-			else:
-				answer_false(1, 3)
-		elif Input.is_action_just_pressed("team1_button4"):
-			if CA == 4:
-				answer_correct(1, 4)
-			else:
-				answer_false(1, 4)
-		
-		elif Input.is_action_just_pressed("team2_button1"): 
-			if CA == 1:
-				answer_correct(2, 1)
-			else:
-				answer_false(2, 1)
-		elif Input.is_action_just_pressed("team2_button2"):
-			if CA == 2:
-				answer_correct(2, 2)
-			else:
-				answer_false(2, 2)
-		elif Input.is_action_just_pressed("team2_button3"):
-			if CA == 3:
-				answer_correct(2, 3)
-			else:
-				answer_false(2, 3)
-		elif Input.is_action_just_pressed("team2_button4"):
-			if CA == 4:
-				answer_correct(2, 4)
-			else:
-				answer_false(2, 4)
+		if t1answered == false:
+			if Input.is_action_just_pressed("team1_button1"):
+				if CA == 1:
+					answer_correct(1, 1)
+				else:
+					answer_false(1, 1)
+			elif Input.is_action_just_pressed("team1_button2"): 
+				if CA == 2:
+					answer_correct(1, 2)
+				else:
+					answer_false(1, 2)
+			elif Input.is_action_just_pressed("team1_button3"):
+				if CA == 3:
+					answer_correct(1, 3)
+				else:
+					answer_false(1, 3)
+			elif Input.is_action_just_pressed("team1_button4"):
+				if CA == 4:
+					answer_correct(1, 4)
+				else:
+					answer_false(1, 4)
+		if t2answered == false:
+			if Input.is_action_just_pressed("team2_button1"): 
+				if CA == 1:
+					answer_correct(2, 1)
+				else:
+					answer_false(2, 1)
+			elif Input.is_action_just_pressed("team2_button2"):
+				if CA == 2:
+					answer_correct(2, 2)
+				else:
+					answer_false(2, 2)
+			elif Input.is_action_just_pressed("team2_button3"):
+				if CA == 3:
+					answer_correct(2, 3)
+				else:
+					answer_false(2, 3)
+			elif Input.is_action_just_pressed("team2_button4"):
+				if CA == 4:
+					answer_correct(2, 4)
+				else:
+					answer_false(2, 4)
+	
 	
 	if Input.is_action_just_pressed("advance"):
 		if(currMode == MODE.STARTSCREEN):
